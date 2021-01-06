@@ -75,12 +75,28 @@ public class TopLevelActivity extends AppCompatActivity {
             }
         });
     }
-        //Close the cursor and database in the onDestroy() method java
-        @Override
-        public void onDestroy(){
-            super.onDestroy();
-            favoritesCursor.close();
-            db.close();
-        }
+
+    //this will get called when the user navigates back to TopLevelActivity
+    //refresh the cursor
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        Cursor newCursor = db.query("DRINK",
+                new String[] { "_id", "NAME"}, "FAVORITE = 1",
+                null, null, null, null);
+        ListView listFavorites = (ListView) findViewById(R.id.list_favorites);
+        CursorAdapter adapter = (CursorAdapter) listFavorites.getAdapter();
+        adapter.changeCursor(newCursor);
+        favoritesCursor = newCursor;
+        //change the value of favoritesCursor to the new cursor so we can close it in the onDestroy() method
+    }
+
+    //Close the cursor and database in the onDestroy() method java
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        favoritesCursor.close();
+        db.close();
+    }
 
 }
